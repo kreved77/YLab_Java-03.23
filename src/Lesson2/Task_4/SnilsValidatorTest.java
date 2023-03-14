@@ -21,5 +21,9 @@ public class SnilsValidatorTest {
         SnilsValidator sv = new SnilsValidatorImpl();
         System.out.println(sv.validate("00000000000"));                             //false
 
+        // проверка на не цифровые символы
+        System.out.println(sv.validate("a0b00c000d0"));                             //false
+        System.out.println(sv.validate("abcdefghijk"));                             //false
+
     }
 }

@@ -9,7 +9,7 @@ public class SnilsValidatorImpl implements SnilsValidator{
 
         boolean result = false;
 //        snils = snils.trim().replaceAll("\\s*","");     // убираем пробелы, если присутствуют
-        if (snils.length() == 11) {
+        if (snils.length() == 11 && snils.matches("\\d*")) {
             int lastTwoDigits = Integer.parseInt(snils.substring(9));   // число в 2 последних разрядах
 
             int sumOfNine = 0;                              // контрольное число для первых 9 цифр
