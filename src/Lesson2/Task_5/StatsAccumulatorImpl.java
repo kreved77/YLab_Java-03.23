@@ -1,10 +1,10 @@
 package Lesson2.Task_5;
 
 public class StatsAccumulatorImpl implements StatsAccumulator {
-    int count = 0;
-    int sum = 0;
-    int min = Integer.MAX_VALUE;
-    int max = Integer.MIN_VALUE;
+    private int count = 0;      // static?
+    private int sum = 0;
+    private int min = Integer.MAX_VALUE;
+    private int max = Integer.MIN_VALUE;
 
     public StatsAccumulatorImpl() {
     }
