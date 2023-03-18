@@ -1,4 +1,4 @@
-package Lessson3.Task_2;
+package Lesson3.Task_2;
 
 import java.util.Date;
 import java.util.HashMap;

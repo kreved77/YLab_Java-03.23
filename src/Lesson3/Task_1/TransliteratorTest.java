@@ -1,4 +1,4 @@
-package Lessson3.Task_1;
+package Lesson3.Task_1;
 
 public class TransliteratorTest {
     public static void main(String[] args) {
