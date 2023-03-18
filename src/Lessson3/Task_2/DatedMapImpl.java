@@ -2,14 +2,17 @@ package Lessson3.Task_2;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 public class DatedMapImpl implements DatedMap {
 
-    HashMap<String,String> mapValue = new HashMap<>();
-    HashMap<String,Date> mapDate = new HashMap<>();
+    private final Map<String,String> mapValue;
+    private final Map<String,Date> mapDate;
 
     public DatedMapImpl() {
+        this.mapValue = new HashMap<>();
+        this.mapDate = new HashMap<>();
     }
 
     @Override

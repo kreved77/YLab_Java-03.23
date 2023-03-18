@@ -1,8 +1,5 @@
 package Lessson3.Task_2;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class DatedMapTest {
     public static void main(String[] args) {
         DatedMap datedMap = new DatedMapImpl();
