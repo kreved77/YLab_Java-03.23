@@ -1,8 +1,8 @@
-package Lessson3.Task_2;
+package Lesson3.Task_2;
 
 public class DatedMapTest {
     public static void main(String[] args) {
-        DatedMap datedMap = new DatedMapImpl();
+        Lesson3.Task_2.DatedMap datedMap = new Lesson3.Task_2.DatedMapImpl();
         System.out.println(datedMap.keySet() + " (keySet)");
         datedMap.remove("555");
 
