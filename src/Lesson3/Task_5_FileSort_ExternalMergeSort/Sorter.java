@@ -7,11 +7,21 @@ import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.Scanner;
 
+/**
+ Базовая реализация sortFile. Сортировка и слияние рекурсивные.
+ Во вложении тестовые файлы на 1к записей.
+ Тест на 100млн записей сортировался 220 секунд + время для проверки на валидность.
+ Дописал счетчики:
+    при распарсинге файла и в Validator'е считаются количество записей, и выводятся в консоль для контроля.
+
+Альтернативная реализация с другим алгоритмом разбиения на чанки пока обдумывается, ведь нет предела совершенству...)
+ */
+
 public class Sorter {
 
     public File sortFile(File dataFile) throws IOException {
         int counterElements = 0;
-        int chunkLength = 375_000_000;
+        int chunkLength = 75_000_000;
         Long[] arr = new Long[chunkLength];
 
         try (FileInputStream fileInputStream = new FileInputStream(dataFile)) {
