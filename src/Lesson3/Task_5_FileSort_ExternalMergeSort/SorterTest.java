@@ -13,13 +13,13 @@ public class SorterTest {
 //        File dataFile = new Generator().generate("src/Lesson3/Task_5_FileSort_ExternalMergeSort/data/data.txt", 375_000_000);
         File dataFile = new Generator().generate("src/Lesson3/Task_5_FileSort_ExternalMergeSort/data/data.txt", 1_000);
         System.out.println(new Validator(dataFile).isSorted()); // false
-//        filePrinter(dataFile);
+//        filePrinter(dataFile);    // for small files (<20) check
 
 
         File sortedFile = new Sorter().sortFile(dataFile);
         System.out.println((System.currentTimeMillis() - beginTime) / 1000 + " (sec) = time of execution");
         System.out.println(new Validator(sortedFile).isSorted()); // true
-//        filePrinter(sortedFile);
+//        filePrinter(sortedFile);    // for small files (<20) check
 
 
         // delete files when the program terminates
