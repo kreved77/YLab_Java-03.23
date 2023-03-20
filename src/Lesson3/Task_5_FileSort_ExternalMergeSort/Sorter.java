@@ -1,86 +1,127 @@
 package Lesson3.Task_5_FileSort_ExternalMergeSort;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.Arrays;
-import java.util.Scanner;
+import java.util.*;
+import java.io.*;
 
 /**
- Базовая реализация sortFile. Сортировка и слияние рекурсивные.
  Во вложении тестовые файлы на 1к записей.
- Тест на 100млн записей сортировался 220 секунд + время для проверки на валидность.
- Дописал счетчики:
-    при распарсинге файла и в Validator'е считаются количество записей, и выводятся в консоль для контроля.
-
-Альтернативная реализация с другим алгоритмом разбиения на чанки пока обдумывается, ведь нет предела совершенству...)
+ checkSizeOfChunk() - проверяет возможность бить на чанки такого размера, исходя из имеющейся freeMemory
+ В Validator'е дописан счетчик: считаются количество записей при распарсинге файла, а потом в Validator'е - и выводятся в консоль для контроля (должны совпасть с параметром из рандом-генератора).
  */
 
 public class Sorter {
+    static int counterElements = 0;
+    static long chunkSize = 100_000_000L; // in bytes
+
+    public static void checkSizeOfChunk() {
+        long freeMem = Runtime.getRuntime().freeMemory();
+        if (chunkSize >= freeMem / 2) {
+            System.err.println(" Can be reached \"out of memory\" for selected chunkSize!  -> chunkSize is reduced");
+            chunkSize = freeMem / 2;
+        }
+    }
 
     public File sortFile(File dataFile) throws IOException {
-        int counterElements = 0;
-        int chunkLength = 75_000_000;
-        Long[] arr = new Long[chunkLength];
-
-        try (FileInputStream fileInputStream = new FileInputStream(dataFile)) {
-            int i = 0;
-            Scanner scanner = new Scanner(fileInputStream);
-
-            while (scanner.hasNextLong()) {
-                arr[i++] = scanner.nextLong();
-                counterElements++;
-            }
-        }
-
-
-        System.out.println(" Input elements counter  = " + counterElements);
-        if (counterElements < chunkLength) {        // "trim" array for small input files <375_000_000 elements
-            arr = Arrays.copyOfRange(arr, 0, counterElements);
-        }
-
 
         File resultFile = new File("src/Lesson3/Task_5_FileSort_ExternalMergeSort/data/result.txt");
-        try (PrintWriter printWriter = new PrintWriter(resultFile)) {
-            for (Long el : mergeSort(arr)) {
-                printWriter.println(el);
-            }
-            printWriter.flush();
-        }
+        checkSizeOfChunk();
 
+        Comparator<String> comparator = new Comparator<String>() {
+            public int compare(String s1, String s2){
+                if (Long.parseLong(s1) < Long.parseLong(s2)) return -1;
+                else if (Long.parseLong(s1) > Long.parseLong(s2)) return 1;
+                return 0;
+            }
+        };
+
+        List<File> l = sortInBatch(dataFile, comparator) ;
+        mergeSortedFiles(l, resultFile, comparator);
+
+        System.out.println(" Input elements counter  = " + counterElements);
         return resultFile;
     }
 
-    public static Long[] mergeSort(Long[] chunk) {
-        if (chunk.length <= 1) {
-            return chunk;
+    public static List<File> sortInBatch(File file, Comparator<String> comparator) throws IOException {
+        List<File> files = new ArrayList<File>();
+        BufferedReader fbr = new BufferedReader(new FileReader(file));
+
+        try{
+            List<String> tmpList =  new ArrayList<String>();
+            String line = "";
+            try {
+                while(line != null) {
+                    long currentChunkSize = 0;
+                    while((currentChunkSize < chunkSize)
+                            &&(   (line = fbr.readLine()) != null) ){
+                        tmpList.add(line);
+                        counterElements++;
+                        currentChunkSize += line.length() / 2 + 40;
+                    }
+                    files.add(sortAndSave(tmpList,comparator));
+                    tmpList.clear();
+                }
+            } catch(EOFException oef) {
+                if(tmpList.size()>0) {
+                    files.add(sortAndSave(tmpList,comparator));
+                    tmpList.clear();
+                }
+            }
+        } finally {
+            fbr.close();
         }
-        Long[] left = Arrays.copyOfRange(chunk, 0, chunk.length / 2);
-        Long[] right = Arrays.copyOfRange(chunk, left.length, chunk.length);
-        return merge(mergeSort(left), mergeSort(right));
+        return files;
     }
 
-    private static Long[] merge(Long[] left, Long[] right) {
-        int resIndex = 0;
-        int leftIndex = 0;
-        int rightIndex = 0;
-        Long[] result = new Long[left.length + right.length];
 
-        while (leftIndex < left.length && rightIndex < right.length)
-            if (left[leftIndex] < right[rightIndex]) {
-                result[resIndex++] = left[leftIndex++];
-            } else {
-                result[resIndex++] = right[rightIndex++];
+    public static File sortAndSave(List<String> tmpList, Comparator<String> comparator) throws IOException  {
+        Collections.sort(tmpList,comparator);  //
+        File newtmpfile = File.createTempFile("sortInBatch", "flatFile");
+        newtmpfile.deleteOnExit();
+        BufferedWriter fbw = new BufferedWriter(new FileWriter(newtmpfile));
+        try {
+            for(String s : tmpList) {
+                fbw.write(s);
+                fbw.newLine();
             }
+        } finally {
+            fbw.close();
+        }
+        return newtmpfile;
+    }
 
-        while (resIndex < result.length)
-            if (leftIndex != left.length) {
-                result[resIndex++] = left[leftIndex++];
-            } else {
-                result[resIndex++] = right[rightIndex++];
+
+    public static int mergeSortedFiles(List<File> files, File outputFile, final Comparator<String> comparator) throws IOException {
+        PriorityQueue<BinaryFileBuffer> pq = new PriorityQueue<BinaryFileBuffer>(11,
+                new Comparator<BinaryFileBuffer>() {
+                    public int compare(BinaryFileBuffer a, BinaryFileBuffer b) {
+                        return comparator.compare(a.peek(), b.peek());
+                    }
+                }
+        );
+        for (File f : files) {
+            BinaryFileBuffer bfb = new BinaryFileBuffer(f);
+            pq.add(bfb);
+        }
+        BufferedWriter fbw = new BufferedWriter(new FileWriter(outputFile));
+        int rowCounter = 0;
+        try {
+            while(pq.size()>0) {
+                BinaryFileBuffer bfb = pq.poll();
+                String s = bfb.pop();
+                fbw.write(s);
+                fbw.newLine();
+                ++rowCounter;
+                if(bfb.empty()) {
+                    bfb.fbr.close();
+                    bfb.originalFile.delete();// we don't need you anymore
+                } else {
+                    pq.add(bfb); // add it back
+                }
             }
-
-        return result;
+        } finally {
+            fbw.close();
+            for(BinaryFileBuffer bfb : pq ) bfb.close();
+        }
+        return rowCounter;
     }
 }
