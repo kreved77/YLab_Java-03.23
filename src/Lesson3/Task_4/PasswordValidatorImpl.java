@@ -14,26 +14,31 @@ public class PasswordValidatorImpl implements PasswordValidator {
     public boolean validatePassword(String login, String password, String confirmPassword)
             throws WrongLoginException, WrongPasswordException {
         boolean result = false;
-        
-        if (!login.matches(regex)) {
-            throw new WrongLoginException("Логин содержит недопустимые символы");
-        } else if (login.length() >= lengthMax) {
-            throw new WrongLoginException("Логин слишком длинный");
+        try {
+            if (!login.matches(regex)) {
+                throw new WrongLoginException("Логин содержит недопустимые символы");
+            } else if (login.length() >= lengthMax) {
+                throw new WrongLoginException("Логин слишком длинный");
 
-        } else if (!password.matches(regex) || !confirmPassword.matches(regex)) {
-            throw new WrongPasswordException("Пароль содержит недопустимые символы");
-        } else if (password.length() >= lengthMax || confirmPassword.length() >= lengthMax) {
-            throw new WrongPasswordException("Пароль слишком длинный");
+            } else if (!password.matches(regex) || !confirmPassword.matches(regex)) {
+                throw new WrongPasswordException("Пароль содержит недопустимые символы");
+            } else if (password.length() >= lengthMax || confirmPassword.length() >= lengthMax) {
+                throw new WrongPasswordException("Пароль слишком длинный");
 
-        } else if (!password.equals(confirmPassword)) {
-            throw new WrongPasswordException("Пароль и подтверждение не совпадают");
+            } else if (!password.equals(confirmPassword)) {
+                throw new WrongPasswordException("Пароль и подтверждение не совпадают");
 
-        } else {
-            result = true;
-            printResult(login, password, confirmPassword, result);
+            } else {
+                result = true;
+                printResult(login, password, confirmPassword, result);
+            }
+        } catch (WrongLoginException wle) {
+            System.out.println(wle.getMessage());
+//        } catch (WrongPasswordException wpe) {
+//            System.out.println(wpe.getMessage());
         }
 
-        return result;  // always true
+        return result;
     }
 
     private void printResult(String login, String password, String confirmPassword, boolean result) {
