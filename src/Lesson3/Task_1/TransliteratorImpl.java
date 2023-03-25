@@ -5,8 +5,8 @@ import java.util.Map;
 
 public class TransliteratorImpl implements Transliterator {
 
-    private static final String alphabetRu = "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЬЫЪЭЮЯ";
-    private static final String alphabetRuToEn = "A,B,V,G,D,E,E,ZH,Z,I,I,K,L,M,N,O,P,R,S,T,U,F,KH,TS,CH,SH,SHCH,IE,Y,,E,IU,IA";
+    private static final String alphabetRu = "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЫЬЪЭЮЯ";
+    private static final String alphabetRuToEn = "A,B,V,G,D,E,E,ZH,Z,I,I,K,L,M,N,O,P,R,S,T,U,F,KH,TS,CH,SH,SHCH,Y,,IE,E,IU,IA";
     private Map<Character, String> mapReplacement;
 
     public TransliteratorImpl() {
@@ -22,6 +22,45 @@ public class TransliteratorImpl implements Transliterator {
         }
         return mapReplacement;
     }
+
+    /*
+    or just hardcode instead of all above
+     */
+//    private Map<Character, String> mapReplacement = Map.of(
+//            'А',"A",
+//            'Б',"B",
+//            'В',"V",
+//            'Г',"G",
+//            'Д',"D",
+//            'Е',"E",
+//            'Ё',"E",
+//            'Ж',"ZH",
+//            'З',"Z",
+//            'И',"I",
+//            'Й',"I",
+//            'К',"K",
+//            'Л',"L",
+//            'М',"M",
+//            'Н',"N",
+//            'О',"O",
+//            'П',"P",
+//            'Р',"R",
+//            'С',"S",
+//            'Т',"T",
+//            'У',"U,",
+//            'Ф',"F,",
+//            'Х',"KH",
+//            'Ц',"TS",
+//            'Ч',"CH",
+//            'Ш',"SH",
+//            'Щ',"SHCH",
+//            'Ы',"Y",
+//            'Ь',"",
+//            'Ъ',"IE",
+//            'Э',"ZH",
+//            'Ю',"IU",
+//            'Я',"IA"
+//    );
 
     @Override
     public String transliterate(String source) {
