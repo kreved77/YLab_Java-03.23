@@ -11,13 +11,13 @@ import java.io.*;
 
 public class Sorter {
     static int counterElements = 0;
-    static long chunkSize = 100_000_000L; // in bytes
+    static long chunkSize = 200_000_000L; // in bytes
 
     public static void checkSizeOfChunk() {
         long freeMem = Runtime.getRuntime().freeMemory();
         if (chunkSize >= freeMem / 2) {
-            System.err.println(" Can be reached \"out of memory\" for selected chunkSize!  -> chunkSize is reduced");
             chunkSize = freeMem / 2;
+            System.err.println(" Can be reached \"out of memory\" for selected chunkSize!  -> chunkSize is reduced to " + chunkSize + " bytes");
         }
     }
 
@@ -28,14 +28,18 @@ public class Sorter {
 
         Comparator<String> comparator = new Comparator<String>() {
             public int compare(String s1, String s2){
-                if (Long.parseLong(s1) < Long.parseLong(s2)) return -1;
-                else if (Long.parseLong(s1) > Long.parseLong(s2)) return 1;
+                if (Long.parseLong(s1) < Long.parseLong(s2)) {
+                    return -1;
+                }
+                else if (Long.parseLong(s1) > Long.parseLong(s2)) {
+                    return 1;
+                }
                 return 0;
             }
         };
 
-        List<File> l = sortInBatch(dataFile, comparator) ;
-        mergeSortedFiles(l, resultFile, comparator);
+        List<File> listOfFiles = sortInBatch(dataFile, comparator) ;
+        mergeSortedFiles(listOfFiles, resultFile, comparator);
 
         System.out.println(" Input elements counter  = " + counterElements);
         return resultFile;
