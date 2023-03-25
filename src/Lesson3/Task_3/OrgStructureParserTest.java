@@ -17,6 +17,9 @@ public class OrgStructureParserTest {
 
         System.out.println("\nFile 2 TEST");
         employeePrinter(orgStructureParser.parseStructure(file2));
+
+
+//        testReadAndWrite();
     }
 
     private static void employeePrinter(Employee employee) {
@@ -29,4 +32,21 @@ public class OrgStructureParserTest {
                 + ", subordinate=" + employee.getSubordinate()
         );
     }
+
+/*    private static void testReadAndWrite() throws IOException {
+        File file1 = new File("src\\Lesson3\\Task_3\\CSV_0_test.csv");
+
+        try (FileInputStream fileInputStream = new FileInputStream(file1)) {
+            Scanner scanner = new Scanner(fileInputStream);
+            while (scanner.hasNextLine()) {
+                String stringFromFile = scanner.nextLine();
+                System.out.println(stringFromFile);
+            }
+        }
+
+        try (PrintWriter printWriter = new PrintWriter(file1)) {
+            printWriter.println("WOWOWOWOW");
+            printWriter.flush();
+        }
+    }*/
 }
