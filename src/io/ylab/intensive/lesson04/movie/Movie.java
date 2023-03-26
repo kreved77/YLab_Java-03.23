@@ -82,4 +82,19 @@ class Movie {
   public void setAwards(Boolean awards) {
     this.awards = awards;
   }
+
+  @Override
+  public String toString() {
+    return "Movie{" +
+            "year=" + year +
+            ", length=" + length +
+            ", title='" + title + '\'' +
+            ", subject='" + subject + '\'' +
+            ", actors='" + actors + '\'' +
+            ", actress='" + actress + '\'' +
+            ", director='" + director + '\'' +
+            ", popularity=" + popularity +
+            ", awards=" + awards +
+            '}';
+  }
 }
