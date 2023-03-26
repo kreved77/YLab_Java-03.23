@@ -1,6 +1,7 @@
 package io.ylab.intensive.lesson04.movie;
 
 import java.io.File;
+import java.io.IOException;
 import java.sql.SQLException;
 import javax.sql.DataSource;
 
@@ -11,11 +12,19 @@ public class MovieTest {
     DataSource dataSource = initDb();
     MovieLoader movieLoader = new MovieLoaderImpl(dataSource);
 
-    File dataFile = new File("movies.csv");
-    movieLoader.loadData(dataFile);
+    try {
+//      File dataFile = new File("movies.csv");
+      File dataFile = new File("src/io/ylab/intensive/lesson04/movie/data/film.csv");
+      movieLoader.loadData(dataFile);
+    } catch (IOException e) {
+      throw new RuntimeException("File not found.");
+    }
 
     /**
-     * Тут написать в комментариях запрос получения всех 
+     * Тут написать в комментариях запрос получения всех
+     *
+     * Запрос - вывод подсчета количества записей с группировкой по жанрам (subject):
+     * SELECT subject,COALESCE(sum(1),0) AS count FROM movie GROUP BY subject;
      */
   }
 
