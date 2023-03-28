@@ -22,21 +22,21 @@ public class FileSortImpl implements FileSorter {
 
   @Override
   public File sort(File data) {
-    File resultFile;
     try {
       readSourceAndSplit(data);
-      resultFile = readDescFromDBAndSave(dataSource);
+      File resultFile = readDescFromDBAndSave(dataSource);
+      return resultFile;
     } catch (IOException exception) {
       throw new RuntimeException(exception);
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }
-    return resultFile;
+//    return null;
   }
 
   private void readSourceAndSplit(File data) throws IOException, SQLException {
     int currentCount = 0;
-    int partSize = 500_000;           // split file to parts for big sizes
+    int partSize = 50_000;           // for huge files -> split data to parts (number of records)
     List<Long> listOfNums = new ArrayList<>();
     try (Scanner scanner = new Scanner(data)) {
       while (scanner.hasNextLong()) {
