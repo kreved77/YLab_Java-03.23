@@ -33,7 +33,7 @@ public class PersonApiImpl implements PersonApi {
 
   public String deletePersonQueueMessageGenerate(Long personId) {
     try {
-      ApiApp.sendMessage("del;" + personId);
+      ApiApp.sendMessageToQueue("del;" + personId);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
@@ -48,7 +48,7 @@ public class PersonApiImpl implements PersonApi {
 
   public String savePersonQueueMessageGenerate(Long personId, String firstName, String lastName, String middleName) {
     try {
-      ApiApp.sendMessage("sav;" + personId + ";" + firstName + ";" + lastName + ";" + middleName + "; ");
+      ApiApp.sendMessageToQueue("sav;" + personId + ";" + firstName + ";" + lastName + ";" + middleName + "; ");
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
