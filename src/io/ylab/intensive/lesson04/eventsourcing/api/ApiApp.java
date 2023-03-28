@@ -47,6 +47,15 @@ public class ApiApp {
 //    personApi.savePerson(person1.getId(), person1.getName(), person1.getLastName(), person1.getMiddleName());
   }
 
+  public static void sendMessageToQueue(String message) throws Exception {
+    ConnectionFactory connectionFactory = initMQ();
+    try (Connection connection = connectionFactory.newConnection();
+         Channel channel = connection.createChannel()) {
+
+      channel.basicPublish(exchangeName, "*", null, message.getBytes());
+    }
+  }
+
   private static void startGenerateAndSavePersonData(PersonApi personApi) {
     List<String> firstNameList = new ArrayList<>(Arrays.asList("Ivan","Petr","Roman","Fedor","Maxim"));
     List<String> lastNameList = new ArrayList<>(Arrays.asList("Ivanov","Petrov","Romanov","Fedorov","Maximov"));
@@ -107,16 +116,6 @@ public class ApiApp {
       System.out.println(p.getId() + " " + p.getName() + " " + p.getLastName() + " " + p.getMiddleName());
     }
   }
-
-  public static void sendMessage(String message) throws Exception {
-    ConnectionFactory connectionFactory = initMQ();
-    try (Connection connection = connectionFactory.newConnection();
-         Channel channel = connection.createChannel()) {
-
-      channel.basicPublish(exchangeName, "*", null, message.getBytes());
-    }
-  }
-
 
   public static DataSource initDb() throws SQLException {
     DataSource dataSource = DbUtil.buildDataSource();
