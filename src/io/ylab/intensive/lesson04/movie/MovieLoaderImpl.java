@@ -15,21 +15,14 @@ public class MovieLoaderImpl implements MovieLoader {
   }
 
   @Override
-  public void loadData(File file) throws IOException {
-//    Map<Long, Movie> movieMap = new HashMap<>();
+  public void loadData(File file) {
     try (FileInputStream fileInputStream = new FileInputStream(file);
          BufferedReader reader = new BufferedReader(new InputStreamReader(fileInputStream))) {
-      reader.readLine();
+      reader.readLine();              // need to skip 2 header lines
       reader.readLine();
       String line;
-//      Long id = 1L;
-//      int headerLines = 2;      // header lines skip count
 
       while ((line = reader.readLine()) != null) {
-//        if (headerLines-- > 0) {          // need to skip the header lines
-//          continue;
-//        }
-
         Movie movie = new Movie();
         try {
           String[] data = line.split(";");
@@ -45,18 +38,19 @@ public class MovieLoaderImpl implements MovieLoader {
           movie.setPopularity(parseInt(data[7]));
           movie.setAwards(parseBoolean(data[8]));
 
-//          movieMap.put(id++, movie);
 //          System.out.println(movie.toString());
         } catch (Exception e) {
           throw new RuntimeException("CSV-file error: empty data or wrong format!");
         }
 
-        try {
-          saveMovie(movie, dataSource);
-        } catch (SQLException e) {
-          throw new RuntimeException(e);
-        }
+        saveMovie(movie, dataSource);
       }
+    } catch (FileNotFoundException e) {
+      throw new RuntimeException(e);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
     }
   }
 
@@ -113,6 +107,7 @@ public class MovieLoaderImpl implements MovieLoader {
       }
 
       preparedStatement.executeUpdate();
+//      connection.close();
     }
   }
 
