@@ -24,16 +24,11 @@ public class ApiApp {
     DataSource dataSource = initDb();
     // Тут пишем создание PersonApi, запуск и демонстрацию работы
 
-//    String exchangeName = "exc";
-//    String queueName = "queue";
-    try (Connection connection = connectionFactory.newConnection();
+    try (Connection connection = connectionFactory.newConnection();   // createExchangeQueueBind
          Channel channel = connection.createChannel()) {
       channel.exchangeDeclare(exchangeName, BuiltinExchangeType.TOPIC);
       channel.queueDeclare(queueName, true, false, false, null);
       channel.queueBind(queueName, exchangeName, "*");
-
-//      channel.basicPublish(exchangeName, "*", null, "Hello World".getBytes());
-//      channel.basicPublish(exchangeName, queueName, null, "Hello World".getBytes());
     }
 
     PersonApi personApi = new PersonApiImpl(dataSource);
@@ -74,14 +69,12 @@ public class ApiApp {
 
   private static void startTestFindPerson(PersonApi personApi) {
     Person personFind = personApi.findPerson(5L);     // exist
-    if (personFind != null) {
-      System.out.println("findPerson: " + personFind.getId() + ", " + personFind.getName() + ", " + personFind.getLastName() + ", " + personFind.getMiddleName());
-    }
+    System.out.println("findPerson: ");
+    printPerson(personFind);
 
     Person personFind2 = personApi.findPerson(55L);   // NOT exist
-    if (personFind2 != null) {
-      System.out.println("personFind2: " + personFind2.getId() + ", " + personFind2.getName() + ", " + personFind2.getLastName() + ", " + personFind2.getMiddleName());
-    }
+    System.out.println("personFind2: ");
+    printPerson(personFind2);
   }
 
   private static void startTestSaveAndUpdatePerson(PersonApi personApi) {
@@ -113,7 +106,13 @@ public class ApiApp {
   private static void startTestFindAllPerson(PersonApi personApi) {
     List<Person> personList = personApi.findAll();
     for (Person p : personList) {
-      System.out.println(p.getId() + " " + p.getName() + " " + p.getLastName() + " " + p.getMiddleName());
+      printPerson(p);
+    }
+  }
+
+  private static void printPerson(Person person) {
+    if (person != null) {
+      System.out.print(person.getId() + ", " + person.getName() + ", " + person.getLastName() + ", " + person.getMiddleName() + "\n");
     }
   }
 
