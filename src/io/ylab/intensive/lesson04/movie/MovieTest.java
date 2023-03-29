@@ -12,13 +12,9 @@ public class MovieTest {
     DataSource dataSource = initDb();
     MovieLoader movieLoader = new MovieLoaderImpl(dataSource);
 
-    try {
-//      File dataFile = new File("movies.csv");
-      File dataFile = new File("src/io/ylab/intensive/lesson04/movie/data/film.csv");
-      movieLoader.loadData(dataFile);
-    } catch (IOException e) {
-      throw new RuntimeException("File not found.");
-    }
+//    File dataFile = new File("movies.csv");
+    File dataFile = new File("src/io/ylab/intensive/lesson04/movie/data/film.csv");
+    movieLoader.loadData(dataFile);
 
     /**
      * Тут написать в комментариях запрос получения всех
