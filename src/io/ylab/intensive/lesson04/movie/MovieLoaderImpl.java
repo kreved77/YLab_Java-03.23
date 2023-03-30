@@ -5,6 +5,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.ArrayList;
+import java.util.List;
 import javax.sql.DataSource;
 
 public class MovieLoaderImpl implements MovieLoader {
@@ -22,6 +24,7 @@ public class MovieLoaderImpl implements MovieLoader {
       reader.readLine();
       String line;
 
+      List<Movie> listOfMovies = new ArrayList<>();
       while ((line = reader.readLine()) != null) {
         Movie movie = new Movie();
         try {
@@ -42,9 +45,9 @@ public class MovieLoaderImpl implements MovieLoader {
         } catch (Exception e) {
           throw new RuntimeException("CSV-file error: empty data or wrong format!");
         }
-
-        saveMovie(movie, dataSource);
+        listOfMovies.add(movie);
       }
+      saveMovie(listOfMovies, dataSource);
     } catch (FileNotFoundException e) {
       throw new RuntimeException(e);
     } catch (IOException e) {
@@ -55,58 +58,41 @@ public class MovieLoaderImpl implements MovieLoader {
   }
 
 
-  private static void saveMovie(Movie movie, DataSource dataSource) throws SQLException {
+  private static void saveMovie(List<Movie> listOfMovies, DataSource dataSource) throws SQLException {
     String insertQuery = "insert into movie (year, length, title, subject, actors, actress, director, popularity, awards) " +
             "values (?, ?, ?, ?, ?, ?, ?, ?, ?)";
     try (Connection connection = dataSource.getConnection();
          PreparedStatement preparedStatement = connection.prepareStatement(insertQuery)) {
-      try {
-        preparedStatement.setInt(1, movie.getYear());
-      } catch (NullPointerException nullPointerException) {
-        preparedStatement.setNull(1, Types.INTEGER);
-      }
-      try {
-        preparedStatement.setInt(2, movie.getLength());
-      } catch (NullPointerException nullPointerException) {
-        preparedStatement.setNull(2, Types.INTEGER);
-      }
-      try {
-        preparedStatement.setString(3, movie.getTitle());
-      } catch (NullPointerException nullPointerException) {
-        preparedStatement.setNull(3, Types.VARCHAR);
-      }
-      try {
-        preparedStatement.setString(4, movie.getSubject());
-      } catch (NullPointerException nullPointerException) {
-        preparedStatement.setNull(4, Types.VARCHAR);
-      }
-      try {
-        preparedStatement.setString(5, movie.getActors());
-      } catch (NullPointerException nullPointerException) {
-        preparedStatement.setNull(5, Types.VARCHAR);
-      }
-      try {
-        preparedStatement.setString(6, movie.getActress());
-      } catch (NullPointerException nullPointerException) {
-        preparedStatement.setNull(6, Types.VARCHAR);
-      }
-      try {
-        preparedStatement.setString(7, movie.getDirector());
-      } catch (NullPointerException nullPointerException) {
-        preparedStatement.setNull(7, Types.VARCHAR);
-      }
-      try {
-        preparedStatement.setInt(8, movie.getPopularity());
-      } catch (NullPointerException nullPointerException) {
-        preparedStatement.setNull(8, Types.INTEGER);
-      }
-      try {
-        preparedStatement.setBoolean(9, movie.getAwards());
-      } catch (NullPointerException nullPointerException) {
-        preparedStatement.setNull(9, Types.BOOLEAN);
-      }
 
-      preparedStatement.executeUpdate();
+      for (int i = 0; i < listOfMovies.size(); i++) {
+        try {
+          preparedStatement.setInt(1, listOfMovies.get(i).getYear());
+        } catch (NullPointerException nullPointerException) {
+          preparedStatement.setNull(1, Types.INTEGER);
+        }
+        try {
+          preparedStatement.setInt(2, listOfMovies.get(i).getLength());
+        } catch (NullPointerException nullPointerException) {
+          preparedStatement.setNull(2, Types.INTEGER);
+        }
+        preparedStatement.setString(3, listOfMovies.get(i).getTitle());
+        preparedStatement.setString(4, listOfMovies.get(i).getSubject());
+        preparedStatement.setString(5, listOfMovies.get(i).getActors());
+        preparedStatement.setString(6, listOfMovies.get(i).getActress());
+        preparedStatement.setString(7, listOfMovies.get(i).getDirector());
+        try {
+          preparedStatement.setInt(8, listOfMovies.get(i).getPopularity());
+        } catch (NullPointerException nullPointerException) {
+          preparedStatement.setNull(8, Types.INTEGER);
+        }
+        try {
+          preparedStatement.setBoolean(9, listOfMovies.get(i).getAwards());
+        } catch (NullPointerException nullPointerException) {
+          preparedStatement.setNull(9, Types.BOOLEAN);
+        }
+        preparedStatement.addBatch();
+      }
+      preparedStatement.executeBatch();
 //      connection.close();
     }
   }
