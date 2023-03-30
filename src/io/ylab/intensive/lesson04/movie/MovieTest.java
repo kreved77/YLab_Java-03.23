@@ -3,6 +3,7 @@ package io.ylab.intensive.lesson04.movie;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.sql.Time;
 import javax.sql.DataSource;
 
 import io.ylab.intensive.lesson04.DbUtil;
@@ -12,9 +13,11 @@ public class MovieTest {
     DataSource dataSource = initDb();
     MovieLoader movieLoader = new MovieLoaderImpl(dataSource);
 
+    System.out.println("startTime = " + new Time(System.currentTimeMillis()));
 //    File dataFile = new File("movies.csv");
     File dataFile = new File("src/io/ylab/intensive/lesson04/movie/data/film.csv");
     movieLoader.loadData(dataFile);
+    System.out.println("endTime   = " + new Time(System.currentTimeMillis()));
 
     /**
      * Тут написать в комментариях запрос получения всех
