@@ -65,35 +65,43 @@ public class MovieLoaderImpl implements MovieLoader {
          PreparedStatement preparedStatement = connection.prepareStatement(insertQuery)) {
 
       for (int i = 0; i < listOfMovies.size(); i++) {
-        try {
-          preparedStatement.setInt(1, listOfMovies.get(i).getYear());
-        } catch (NullPointerException nullPointerException) {
-          preparedStatement.setNull(1, Types.INTEGER);
-        }
-        try {
-          preparedStatement.setInt(2, listOfMovies.get(i).getLength());
-        } catch (NullPointerException nullPointerException) {
-          preparedStatement.setNull(2, Types.INTEGER);
-        }
-        preparedStatement.setString(3, listOfMovies.get(i).getTitle());
-        preparedStatement.setString(4, listOfMovies.get(i).getSubject());
-        preparedStatement.setString(5, listOfMovies.get(i).getActors());
-        preparedStatement.setString(6, listOfMovies.get(i).getActress());
-        preparedStatement.setString(7, listOfMovies.get(i).getDirector());
-        try {
-          preparedStatement.setInt(8, listOfMovies.get(i).getPopularity());
-        } catch (NullPointerException nullPointerException) {
-          preparedStatement.setNull(8, Types.INTEGER);
-        }
-        try {
-          preparedStatement.setBoolean(9, listOfMovies.get(i).getAwards());
-        } catch (NullPointerException nullPointerException) {
-          preparedStatement.setNull(9, Types.BOOLEAN);
-        }
+        preparedSetIntOrNullValidator(preparedStatement, 1, listOfMovies.get(i).getYear());
+        preparedSetIntOrNullValidator(preparedStatement, 2, listOfMovies.get(i).getLength());
+        preparedSetStringOrNullValidator(preparedStatement, 3, listOfMovies.get(i).getTitle());
+        preparedSetStringOrNullValidator(preparedStatement, 4, listOfMovies.get(i).getSubject());
+        preparedSetStringOrNullValidator(preparedStatement, 5, listOfMovies.get(i).getActors());
+        preparedSetStringOrNullValidator(preparedStatement, 6, listOfMovies.get(i).getActress());
+        preparedSetStringOrNullValidator(preparedStatement, 7, listOfMovies.get(i).getDirector());
+        preparedSetIntOrNullValidator(preparedStatement, 8, listOfMovies.get(i).getPopularity());
+        preparedSetBooleanOrNullValidator(preparedStatement, 9, listOfMovies.get(i).getAwards());
         preparedStatement.addBatch();
       }
       preparedStatement.executeBatch();
 //      connection.close();
+    }
+  }
+
+  private static void preparedSetIntOrNullValidator(PreparedStatement preparedStatement, int parameterIndex, Integer movieField) throws SQLException {
+    try {
+      preparedStatement.setInt(parameterIndex, movieField);
+    } catch (NullPointerException nullPointerException) {
+      preparedStatement.setNull(parameterIndex, Types.INTEGER);
+    }
+  }
+
+  private static void preparedSetStringOrNullValidator(PreparedStatement preparedStatement, int parameterIndex, String movieField) throws SQLException {
+    try {
+      preparedStatement.setString(parameterIndex, movieField);
+    } catch (NullPointerException nullPointerException) {
+      preparedStatement.setNull(parameterIndex, Types.VARCHAR);
+    }
+  }
+
+  private static void preparedSetBooleanOrNullValidator(PreparedStatement preparedStatement, int parameterIndex, Boolean movieField) throws SQLException {
+    try {
+      preparedStatement.setBoolean(parameterIndex, movieField);
+    } catch (NullPointerException nullPointerException) {
+      preparedStatement.setNull(parameterIndex, Types.BOOLEAN);
     }
   }
 
