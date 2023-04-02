@@ -5,7 +5,9 @@ import java.util.List;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.stereotype.Component;
 
+@Component
 public class SQLQueryExtenderTest {
   public static void main(String[] args) throws SQLException {
     AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext(Config.class);
@@ -16,5 +18,9 @@ public class SQLQueryExtenderTest {
     for (String tableName : tables) {
       System.out.println(queryBuilder.queryForTable(tableName));
     }
+
+    System.out.println("\nFixed test tables:");
+    System.out.println(queryBuilder.queryForTable("nullTableName"));  // null
+    System.out.println(queryBuilder.queryForTable("person"));         // SELECT person_id, first_name, last_name, middle_name FROM person;
   }
 }
