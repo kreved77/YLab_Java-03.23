@@ -11,8 +11,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ComponentScan
-//@ComponentScan("io.ylab.intensive.lesson05.eventsourcing.db")
+@ComponentScan("io.ylab.intensive.lesson05.eventsourcing.db")
 public class Config {
 
   @Bean

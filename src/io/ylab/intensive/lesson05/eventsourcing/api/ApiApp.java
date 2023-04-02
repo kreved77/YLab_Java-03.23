@@ -2,13 +2,14 @@ package io.ylab.intensive.lesson05.eventsourcing.api;
 
 import io.ylab.intensive.lesson05.eventsourcing.Person;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-
+@Component
 public class ApiApp {
   public static void main(String[] args) throws Exception {
     // Тут пишем создание PersonApi, запуск и демонстрацию работы
