@@ -6,12 +6,10 @@ import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.GetResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.stereotype.Component;
 
-
+@Component
 public class DbApp {
-  @Autowired
-  static DbSender dbSender;
-
   public static void main(String[] args) throws Exception {
     AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext(Config.class);
     applicationContext.start();
@@ -19,6 +17,8 @@ public class DbApp {
     // тут пишем создание и запуск приложения работы с БД
 
     ConnectionFactory connectionFactory = applicationContext.getBean(ConnectionFactory.class);
+//    DbSender dbSender = applicationContext.getBean(DbSender.class);
+
     String queueName = "queue";
     try (Connection connection = connectionFactory.newConnection();
          Channel channel = connection.createChannel()) {
@@ -33,13 +33,18 @@ public class DbApp {
     }
   }
 
+  @Autowired
+  static DbSender dbSender;
+
 
   public static void parseMessage(String received) {
     System.out.println("\n NEXT: " + received);
+
     if ("sav".equals(received.substring(0,3))) {
       String[] strArr = received.substring(4).split(";");
       dbSender.savePerson(Long.valueOf(strArr[0]), strArr[1], strArr[2], strArr[3]);
     }
+
     if ("del".equals(received.substring(0,3))) {
       String str = received.substring(4);
       dbSender.deletePerson(Long.valueOf(str));
