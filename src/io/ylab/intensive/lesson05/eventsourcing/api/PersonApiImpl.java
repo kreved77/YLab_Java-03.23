@@ -14,19 +14,27 @@ import java.util.List;
 
 @Component
 public class PersonApiImpl implements PersonApi {
-    @Autowired
-    private DataSource dataSource;
-    @Autowired
-    private RabbitSender rabbitSender;
 
-//    public PersonApiImpl() {
-//    }
-//
+    static DataSource dataSource;
+    static RabbitSender rabbitSender;
+
+    @Autowired
+    public void setDataSource(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+
+    @Autowired
+    public void setRabbitSender(RabbitSender rabbitSender) {
+        this.rabbitSender = rabbitSender;
+    }
+
+    // V_2
 //    @Autowired
-//    public PersonApiImpl(DataSource dataSource) {
-//        this.dataSource = dataSource;
-//    }
-//
+//    private DataSource dataSource;
+//    @Autowired
+//    private RabbitSender rabbitSender;
+
+    // V_3
 //    @Autowired
 //    public PersonApiImpl(DataSource dataSource, RabbitSender rabbitSender) {
 //        this.dataSource = dataSource;
@@ -38,7 +46,7 @@ public class PersonApiImpl implements PersonApi {
         System.out.println(deletePersonQueueMessageGenerate(personId));
     }
 
-    public String deletePersonQueueMessageGenerate(Long personId) {
+    private String deletePersonQueueMessageGenerate(Long personId) {
         try {
             rabbitSender.sendMessageToQueue("del;" + personId);
         } catch (Exception e) {
@@ -52,7 +60,7 @@ public class PersonApiImpl implements PersonApi {
         System.out.println(savePersonQueueMessageGenerate(personId, firstName, lastName, middleName));
     }
 
-    public String savePersonQueueMessageGenerate(Long personId, String firstName, String lastName, String middleName) {
+    private String savePersonQueueMessageGenerate(Long personId, String firstName, String lastName, String middleName) {
         try {
             rabbitSender.sendMessageToQueue("sav;" + personId + ";" + firstName + ";" + lastName + ";" + middleName + "; ");
         } catch (Exception e) {
