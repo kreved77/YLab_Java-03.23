@@ -1,0 +1,127 @@
+package io.ylab.intensive.lesson05.messagefilter;
+
+import io.ylab.intensive.lesson05.eventsourcing.db.DbApp;
+import org.postgresql.ds.PGSimpleDataSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import javax.sql.DataSource;
+import java.io.*;
+import java.sql.*;
+import java.util.*;
+
+@Component
+public class StopWordValidatorImpl implements StopWordValidator {
+    static final String tableName = "words_filter";
+    static DataSource dataSource;
+
+    @Autowired
+    public void setDataSource(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+
+    @Override
+    public String validateText(String sentence) throws SQLException {
+        if (sentence == null || sentence.equals("")) {
+            return sentence;
+        }
+        StringBuilder stringBuilder = new StringBuilder(sentence);
+
+        Set<String> setOfWords = new HashSet<>();
+        for (String s : sentence.split("[ .,:;?!\\n]+")) {
+            setOfWords.add(s);
+        }
+
+        Iterator<String> iterator = setOfWords.iterator();
+        while (iterator.hasNext()) {
+            String word = iterator.next();
+            if (word.length() > 2 && findWord(word.toLowerCase())) {
+                int countReplace = word.length() - 2;                   // count of replace **** (word -> w**d)
+                int lowIndex = stringBuilder.indexOf(word);             // meet at
+                while (lowIndex >= 0) {
+                    stringBuilder.replace(lowIndex+1, lowIndex+1 + countReplace, "*".repeat(countReplace));
+                    lowIndex = stringBuilder.indexOf(word);
+                }
+            }
+        }
+        return stringBuilder.toString();
+    }
+
+    private boolean findWord(String word) throws SQLException {
+        String containsKeyQuery = "SELECT word FROM " + tableName + " WHERE word=?";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(containsKeyQuery)) {
+            preparedStatement.setString(1, word);
+            return preparedStatement.executeQuery().next();
+        }
+    }
+
+    @Override
+    public void loadData(File file) {
+        try (FileInputStream fileInputStream = new FileInputStream(file);
+             BufferedReader reader = new BufferedReader(new InputStreamReader(fileInputStream))) {
+            String line;
+
+            List<String> listOfWords = new ArrayList<>();
+            while ((line = reader.readLine()) != null) {
+                listOfWords.add(line);
+            }
+            createOrClearTableInDB();
+            saveWordsToDB(listOfWords);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void createOrClearTableInDB() throws SQLException {
+        try (Connection connection = dataSource.getConnection()) {
+            java.sql.DatabaseMetaData databaseMetaData = connection.getMetaData();
+            try (ResultSet table = databaseMetaData.getTables(null, null, tableName, new String[]{"TABLE"})){
+
+                String querySQL = "";
+                if (table.next()) {
+                    querySQL = "TRUNCATE TABLE " + tableName + ";";
+                    System.out.println("(ServiceMessage: Table \"" + tableName + "\" is cleared.)");
+                } else {
+                    querySQL = "CREATE TABLE " + tableName + " (\n"
+                            + "\tword varchar\n"
+                            + ");";
+                    System.out.println("(ServiceMessage: Table \"" + tableName + "\" is created.)");
+                }
+
+                PreparedStatement preparedStatement = connection.prepareStatement(querySQL);
+                preparedStatement.executeUpdate();
+                preparedStatement.close();
+
+                table.close();
+                connection.close();
+            }
+        }
+    }
+
+
+    private void saveWordsToDB(List<String> listOfWords) throws SQLException {
+        String insertQuery = "insert into " + tableName + " (word) values (?)";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(insertQuery)) {
+            for (int i = 0; i < listOfWords.size(); i++) {
+                preparedStatement.setString(1, listOfWords.get(i));
+                preparedStatement.addBatch();
+            }
+            preparedStatement.executeBatch();
+            System.out.println("(ServiceMessage: Table \"" + tableName + "\" is updated.)");
+            connection.close();
+        }
+    }
+
+//    public void executeQuery(DataSource datasource, String query) throws SQLException {
+//        try (Connection connection = dataSource.getConnection();
+//        PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+//            preparedStatement.execute();
+//        }
+//    }
+}
