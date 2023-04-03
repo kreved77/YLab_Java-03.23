@@ -19,8 +19,16 @@ public class SQLQueryExtenderTest {
       System.out.println(queryBuilder.queryForTable(tableName));
     }
 
-    System.out.println("\nFixed test tables:");
-    System.out.println(queryBuilder.queryForTable("nullTableName"));  // null
-    System.out.println(queryBuilder.queryForTable("person"));         // SELECT person_id, first_name, last_name, middle_name FROM person;
+
+    // ДОПОЛНИТЕЛЬНО вот так сгенерируем запросы ТОЛЬКО для ПОЛЬЗОВАТЕЛЬСКИХ таблиц, что есть в БД
+    System.out.println("\nTEST-method: get only User's tables");
+    tables = SQLQueryExtender.getUserTablesOnly();
+    for (String tableName : tables) {
+      System.out.println(queryBuilder.queryForTable(tableName));
+    }
+
+//    System.out.println("\nFixed test tables:");
+//    System.out.println(queryBuilder.queryForTable("nullTableName"));  // null
+//    System.out.println(queryBuilder.queryForTable("person"));         // SELECT person_id, first_name, last_name, middle_name FROM person;
   }
 }
