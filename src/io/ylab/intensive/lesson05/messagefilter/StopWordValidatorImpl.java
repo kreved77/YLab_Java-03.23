@@ -1,7 +1,5 @@
 package io.ylab.intensive.lesson05.messagefilter;
 
-import io.ylab.intensive.lesson05.eventsourcing.db.DbApp;
-import org.postgresql.ds.PGSimpleDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -9,6 +7,7 @@ import javax.sql.DataSource;
 import java.io.*;
 import java.sql.*;
 import java.util.*;
+import java.util.regex.*;
 
 @Component
 public class StopWordValidatorImpl implements StopWordValidator {
@@ -25,23 +24,31 @@ public class StopWordValidatorImpl implements StopWordValidator {
         if (sentence == null || sentence.equals("")) {
             return sentence;
         }
-        StringBuilder stringBuilder = new StringBuilder(sentence);
 
         Set<String> setOfWords = new HashSet<>();
         for (String s : sentence.split("[ .,:;?!\\n]+")) {
             setOfWords.add(s);
         }
 
+        StringBuilder stringBuilder = new StringBuilder(sentence);
         Iterator<String> iterator = setOfWords.iterator();
         while (iterator.hasNext()) {
             String word = iterator.next();
             if (word.length() > 2 && findWord(word.toLowerCase())) {
                 int countReplace = word.length() - 2;                   // count of replace **** (word -> w**d)
-                int lowIndex = stringBuilder.indexOf(word);             // meet at
-                while (lowIndex >= 0) {
-                    stringBuilder.replace(lowIndex+1, lowIndex+1 + countReplace, "*".repeat(countReplace));
-                    lowIndex = stringBuilder.indexOf(word);
-                }
+
+                // v_1 - don't work for repeated same words but longer
+//                int lowIndex = stringBuilder.indexOf(word);             // meet at
+//                while (lowIndex >= 0) {
+//                    stringBuilder.replace(lowIndex+1, lowIndex+1 + countReplace, "*".repeat(countReplace));
+//                    lowIndex = stringBuilder.indexOf(word);
+//                }
+
+                // v_2 - works fine
+                Pattern p = Pattern.compile("\\b" + word + "\\b");
+                Matcher m = p.matcher(stringBuilder);
+                String replacer = word.charAt(0) + "*".repeat(countReplace) + word.charAt(word.length()-1);
+                stringBuilder = new StringBuilder(m.replaceAll(replacer));
             }
         }
         return stringBuilder.toString();
