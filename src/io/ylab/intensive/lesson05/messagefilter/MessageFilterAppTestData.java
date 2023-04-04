@@ -9,13 +9,12 @@ public class MessageFilterAppTestData {
     // TEST DATA
     static void runTestToRabbit(ConnectionFactory connectionFactory, String exchangeName, String queueInput) {
         try {
-            MessageFilterApp.sendMessageToQueueInput("жопа жопа жопа жопа жопа жопа жопа жопа", connectionFactory, exchangeName, queueInput);
-            MessageFilterApp.sendMessageToQueueInput("жопа", connectionFactory, exchangeName, queueInput);
             MessageFilterApp.sendMessageToQueueInput("", connectionFactory, exchangeName, queueInput);
             MessageFilterApp.sendMessageToQueueInput("жопа", connectionFactory, exchangeName, queueInput);
             MessageFilterApp.sendMessageToQueueInput("мама", connectionFactory, exchangeName, queueInput);
             MessageFilterApp.sendMessageToQueueInput("мама МЫла раму 123абв - mama MIla ramu 123abc", connectionFactory, exchangeName, queueInput);
             MessageFilterApp.sendMessageToQueueInput("СоЛнЦе х_у_я_р_а серун срака.серун,срака;серун?серун!срака.\nсерун\nсрака", connectionFactory, exchangeName, queueInput);
+            MessageFilterApp.sendMessageToQueueInput("ебуч ебуч ЕБУЧ ебуче ебучее ебучий ебучим ебуч", connectionFactory, exchangeName, queueInput);
             MessageFilterApp.sendMessageToQueueInput("Какдвапальцаобоссать КаКдВаПаЛьцаобоССАть", connectionFactory, exchangeName, queueInput);
             MessageFilterApp.sendMessageToQueueInput("6ля 6ля 6ля, ты смотри какой прекрасный СуКа день, а ты будешь спать козел ебучиЙ!  fuck:падонок -- ГаВно   жопа?смотри мои серун срака серун_срака серун срака zaeb  6ля", connectionFactory, exchangeName, queueInput);
         } catch (Exception e) {

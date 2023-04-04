@@ -25,6 +25,39 @@ public class StopWordValidatorImpl implements StopWordValidator {
             return sentence;
         }
 
+        // **********************************
+        // Validates (BULK) all words from input string
+
+        Map<String, Boolean> wordsMap = new HashMap<>();
+        for (String word : sentence.split("[ .,:;?!\\n]+")) {
+            if (word.length() > 2) {
+                wordsMap.put(word, false);
+            }
+        }
+
+        // check all words: if find -> set value "true"
+        findWordsFromMap(wordsMap);
+
+        StringBuilder stringBuilder = new StringBuilder(sentence);
+
+        // iterating the key value pair using for each loop
+        for (Map.Entry<String, Boolean> entry : wordsMap.entrySet()) {
+            if (entry.getValue()) {
+                String badWord = entry.getKey();
+                Pattern p = Pattern.compile("\\b" + badWord + "\\b");     // set pattern to find exact separate word
+                Matcher m = p.matcher(stringBuilder);
+                int countReplace = badWord.length() - 2;                        // count of replace **** (word -> w**d)
+                String replacer = badWord.charAt(0) + "*".repeat(countReplace) + badWord.charAt(badWord.length()-1);
+                stringBuilder = new StringBuilder(m.replaceAll(replacer));
+            }
+        }
+        return stringBuilder.toString();
+
+
+        // **********************************
+        // Validates single word one-by-one
+
+        /*
         Set<String> setOfWords = new HashSet<>();
         for (String s : sentence.split("[ .,:;?!\\n]+")) {
             setOfWords.add(s);
@@ -52,6 +85,7 @@ public class StopWordValidatorImpl implements StopWordValidator {
             }
         }
         return stringBuilder.toString();
+         */
     }
 
     private boolean findWord(String word) throws SQLException {
@@ -61,6 +95,24 @@ public class StopWordValidatorImpl implements StopWordValidator {
             preparedStatement.setString(1, word);
             return preparedStatement.executeQuery().next();
         }
+    }
+
+    private Map<String, Boolean> findWordsFromMap(Map<String, Boolean> wordsMap) throws SQLException {
+        String containsKeyQuery = "SELECT word FROM " + tableName + " WHERE word=?";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(containsKeyQuery)) {
+
+            for (String s : wordsMap.keySet()) {
+                preparedStatement.setString(1, s.toLowerCase());
+
+                ResultSet resultSet = preparedStatement.executeQuery();
+                if (resultSet.next()) {
+                    wordsMap.replace(s, true);
+                }
+                resultSet.close();
+            }
+        }
+        return wordsMap;
     }
 
     @Override
