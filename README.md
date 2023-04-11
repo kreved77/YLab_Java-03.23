@@ -1,5 +1,10 @@
 # YLab_Java-03.23
-YLab - Intensive course Java 03.23
+### YLab - Intensive course Java 03.23 
+https://university.ylab.io/java-from-scratch
+
+#### • Основы Java • ООП • Коллекции и работа с файлами IO • Exceptions 
+#### • Spring и Spring Boot 
+#### • PosgtreSQL и JDBC • RabbitMQ • JUnit • Git • Maven 
 
 ## Занятие 5
 (Spring, DatabaseMetaData, RabbitMQ, Maven)
